@@ -135,7 +135,9 @@ def cadastro():
         "endereço": (endereco),
         "telefone": (telefone),
         "gmail": (gmail),
-        "senha": (senha)
+        "senha": (senha),
+        "saldo da conta": 0,
+        "empréstimo": 0
     }
 
     dados["usuarios"].append(usuario)
