@@ -1,6 +1,5 @@
 import json
 import os
-from cryptography.fernet import Fernet
 
 ARQUIVO_USUARIO = "usuario.json"
 
@@ -23,46 +22,114 @@ def carregar_usuarios():
 def salvar_usuarios(dados):
     with open(ARQUIVO_USUARIO, "w", encoding='utf-8') as file:
         json.dump(dados, file, ensure_ascii=False, indent=4)
+
+def limpa_tela():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def verificar_usuario_existente(campo, valor):
+    dados = carregar_usuarios()
+    for usuario in dados["usuarios"]:
+        try:
+            if campo == "nome_usuario":
+                if usuario["nome_usuario"] == valor:
+                    return True
+            else:
+                if usuario[campo] == valor:
+                    return True
+        except Exception:
+            continue
+    return False
 #----------------------------------------------------------------------------#
-print("--BANCO DARKE--")
-print("-BEM VINDO AO BANCO DARKE-")
+print("-------BANCO DARKE-------")
+print("--BEM VINDO AO BANCO DARKE--\n")
 
 def menu():
-    print("1. CADASTRO")
-    print("2. LOGIN")
-    print("3. SAIR")
-
-    opcao = int(input("Digite o número da operação: "))
-
     while True:
-        if opcao == 1:
+        print("1. CADASTRO")
+        print("2. LOGIN")
+        print("3. SAIR")
+
+        opcao = input("\nDigite o número da operação: ")
+
+        if opcao == "1":
             cadastro()
-        elif opcao == 2:
+        elif opcao == "2":
             login()
-        elif opcao == 3:
+        elif opcao == "3":
             print("Saindo do banco...")
             print("Volte sempre.")
             break
         else:
-            print("Escolha uma operação de 1 a 3")
+            print("\nEscolha uma operação de 1 a 3")
 
 def cadastro():
-    print("--ÁREA DE CADASTRO")
+    print("\n--ÁREA DE CADASTRO--")
 
     dados = carregar_usuarios()
 
-    nome = input("Digite o seu nome: ")
-    sobrenome = input("\nDigite o seu sobrenome: ")
-    cpf = input("\nDigite o seu CPF ('Apenas números'): ")
-    rg =input("Digite o número do seu RG: ")
-    endereco = input("\nDigite o seu endereço: ")
-    telefone = input("\nDigite o seu número de telefone: ")
-    gmail = input("\nDigite o seu gmail: ")
-    senha = input("\nDigite a sua senha: ")
+    nome_usuario = input("\nDigite o nome de usuário (ex: nome.sobrenome): ").strip()
+    while verificar_usuario_existente("nome_usuario", nome_usuario):
+        print("Nome de usuário já existe. Tente outro.")
+        nome_usuario = input("\nDigite o nome de usuário: ").strip()
+
+    nome = input("\nDigite o seu nome: ").strip()
+    sobrenome = input("\nDigite o seu sobrenome: ").strip()
+
+    idade = int(input("\nDigite a sua idade: "))
+    while idade <= 17:
+        print("Você ainda é menor de idade para criar uma conta neste banco")
+        idade = int(input("\nDigite a sua idade: "))
+
+    data_nascimento = input("\nDigite a sua data de nascimento: ").strip()
+
+    cpf = input("\nDigite o CPF: ").strip()
+    while len(cpf) != 11 or not cpf.isdigit() or verificar_usuario_existente("cpf", cpf):
+        if verificar_usuario_existente("cpf", cpf):
+            print("CPF já existe. Tente outro.")
+        else:
+            print("CPF inválido. Deve ter 11 dígitos.")
+        cpf = input("\nDigite o CPF: ").strip()
+
+    rg = input("\nDigite o seu RG: ").strip()
+    while len(rg) < 7 or not rg.isdigit() or verificar_usuario_existente("rg", rg):
+        if verificar_usuario_existente("rg", rg):
+            print("RG já existe. Tente outro.")
+        else:
+            print("RG inválido. Deve ter pelo menos 7 dígitos.")
+        rg = input("\nDigite o seu RG: ").strip()
+
+    endereco = input("\nDigite o seu endereço: ").strip()
+    while len(endereco) < 5:
+        print("Endereço inválido. Deve ter pelo menos 5 caracteres.")
+        endereco = input("\nDigite o seu endereço: ").strip()
+
+    telefone = input("\nDigite o seu telefone: ").strip()
+    while len(telefone) != 11 or not telefone.isdigit() or verificar_usuario_existente("telefone", telefone):
+        if verificar_usuario_existente("telefone", telefone):
+            print("Telefone já esxite. Tente outro.")
+        else:
+            print("Telefone inválido. Deve ter 11 dígitos")
+        telefone = input("\nDigite o seu número de telefone: ").strip()
+
+    gmail = input("\nDigite o seu gmail: ").strip()
+    while "@" not in gmail or ".com" not in gmail or verificar_usuario_existente("gmail", gmail):
+        if verificar_usuario_existente("gmail", gmail):
+            print("Email já cadastrado. Tente outro.")
+        else:
+            print("Email inválido. Deve conter @ e .com")
+        gmail = input("\nDigite o seu gmail: ").strip()
+
+    senha = input("\nDigite a sua senha: ").strip()
+    while len(senha) < 6:
+        print("A senha deve ter pelo menos 6 caracteres.")
+        senha = input("\nDigite a sua senha: ").strip()
 
     usuario = {
+        "nome_usuario": (nome_usuario),
         "nome": (nome),
         "sobrenome": (sobrenome),
+        "idade": (idade),
+        "data de nascimento": (data_nascimento),
         "cpf": (cpf),
         "rg": (rg),
         "endereço": (endereco),
@@ -73,43 +140,52 @@ def cadastro():
 
     dados["usuarios"].append(usuario)
     salvar_usuarios(dados)
-
-    print("Cadastro realizado com sucesso")
+    limpa_tela()
+    print("Cadastro realizado com sucesso\n")
 
 def login():
     print("--ÁREA DE LOGIN--")
 
+    nome_usuario = input("\nDigite seu usuário: ")
     cpf = input("\nDigite o seu CPF ('Apenas números'): ")
     senha = input("\nDigite a sua senha: ")
 
-    print("Login realizado com sucesso")
+    dados = carregar_usuarios()
+    for usuario in dados["usuarios"]:
+        if usuario["nome_usuario"] == nome_usuario and usuario["cpf"] == cpf and usuario["senha"] == senha:
+            limpa_tela()
+            print("Login realizado com sucesso")
+            usuario_logado(usuario)
+            return
+
+    print("\nUsuário, CPF ou senha incorretos")
 #----------------------------------------------------------------------------#
-def usuario_logado():
-    print("--MENU PRINCIPAL")
-    print("Usuário: \n")
-
-    print("1. VER SALDO DISPONÍVEL")
-    print("2. PIX")
-    print("3. HISTÓRICO DE TRANSFERÊNCIA")
-    print("4. EMPRÉSTIMO")
-    print("5. SAIR DA CONTA")
-
-    opcao = int(input("Digite o número da operação: "))
-
+def usuario_logado(usuario):
     while True:
-        if opcao == 1:
+        print("\n--MENU PRINCIPAL--")
+        print(f"Usuário: {usuario['nome_usuario']}\n")
+
+        print("1. VER SALDO DISPONÍVEL")
+        print("2. PIX")
+        print("3. HISTÓRICO DE TRANSFERÊNCIA")
+        print("4. EMPRÉSTIMO")
+        print("5. SAIR DA CONTA")
+
+        opcao = input("Digite o número da operação: ")
+
+        if opcao == "1":
             saldo_disponivel()
-        elif opcao == 2:
+        elif opcao == "2":
             area_pix()
-        elif opcao == 3:
+        elif opcao == "3":
             historico_transferencia()
-        elif opcao == 4:
+        elif opcao == "4":
             emprestimo()
-        elif opcao == 5:
-            print("Saindo da conta...")
+        elif opcao == "5":
+            print("\nSaindo da conta...")
             menu()
         else:
-            print("Escolha uma operação de 1 a 5")
+            print("\nEscolha uma operação de 1 a 5")
 
 def saldo_disponivel():
     print("Saldo disponível: 0")
@@ -122,3 +198,7 @@ def historico_transferencia():
 
 def emprestimo():
     print("Empréstimo")
+
+if __name__ == '__main__':
+    inicializar_arquivo()
+    menu()
