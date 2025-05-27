@@ -176,7 +176,7 @@ def usuario_logado(usuario):
         opcao = input("Digite o número da operação: ")
 
         if opcao == "1":
-            saldo_disponivel()
+            saldo_disponivel(usuario)
         elif opcao == "2":
             area_pix()
         elif opcao == "3":
@@ -189,11 +189,72 @@ def usuario_logado(usuario):
         else:
             print("\nEscolha uma operação de 1 a 5")
 
-def saldo_disponivel():
-    print("Saldo disponível: 0")
+def saldo_disponivel(usuario):
+    print("--SALDO--")
+    print(f"\nSaldo disponível: {usuario['saldo da conta']}")
+    input("\nPressione 'Enter' tecla para continuar...")
 
 def area_pix():
-    print("pix")
+    print("--ÁREA PIX--")
+    print("1. Fazer pix")
+    print("2. Registrar chave pix")
+    print("3. Voltar")
+
+def fazer_pix():
+    print("--FAZER PIX--")
+    buscar_usuario = input("Digite a chave pix do destinatário: ").strip()
+    dados = carregar_usuarios()
+    
+    for usuario in dados["usuarios"]:
+        if usuario["chave_pix"] == buscar_usuario:
+            if "chave_pix" in usuario and usuario["chave_pix"]:
+                valor = float(input("Digite o valor do pix: "))
+                if valor <= 0:
+                    print("Valor inválido. Deve ser maior que zero.")
+                    return
+                print(f"Pix de R${valor} enviado para {usuario['nome_usuario']} com sucesso!")
+                return
+            else:
+                print("Usuário não possui chave pix registrada.")
+                return
+            
+    
+
+def registrar_chave(usuario):
+    print("\n--REGISTRAR CHAVE PIX--")
+    print("1. Gmail")
+    print("2. Telefone")
+    print("3. CPF")
+
+    opcao = input("\nEscolha chave pix que você deseja registrar: ")
+
+    dados = carregar_usuarios()
+    for usuario in dados["usuarios"]:
+        if usuario["nome_usuario"] == usuario["nome_usuario"]:
+            if opcao == "1":
+                chave_pix = input("Digite seu gmail: ")
+                if chave_pix == usuario["gmail"]:
+                    usuario["chave_pix"] = chave_pix
+
+                    salvar_usuarios(dados)
+                    return True
+                
+            elif opcao == "2":
+                chave_pix = input("Digite seu telefone: ")
+                if chave_pix == usuario["telefone"]:
+                    usuario["chave_pix"] = chave_pix
+
+                    salvar_usuarios(dados)
+                    return True
+                
+            elif opcao == "3":
+                chave_pix = input("Digite seu CPF: ")
+                if chave_pix == usuario["cpf"]:
+                    usuario["chave_pix"] = chave_pix
+
+                    salvar_usuarios(dados)
+                    return True
+    return False
 
 def historico_transferencia():
     print("Histórico de transferÊncia")
