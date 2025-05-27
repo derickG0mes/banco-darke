@@ -190,13 +190,13 @@ def usuario_logado(usuario):
             print("\nEscolha uma operação de 1 a 5")
 
 def saldo_disponivel(usuario):
-    print("--SALDO--")
+    print("\n--SALDO DA CONTA--")
     print(f"\nSaldo disponível: {usuario['saldo da conta']}")
     input("\nPressione 'Enter' tecla para continuar...")
 
 def area_pix(usuario):
     while True:
-        print("--ÁREA PIX--")
+        print("\n--ÁREA PIX--")
         print("1. Fazer pix")
         print("2. Registrar chave pix")
         print("3. Voltar")
@@ -214,6 +214,12 @@ def fazer_pix(usuario):
     buscar_usuario = input("Digite a chave pix do destinatário: ").strip()
     dados = carregar_usuarios()
     
+    # Encontrar o usuário remetente nos dados
+    for indice, usuario_atual in enumerate(dados["usuarios"]):
+        if usuario_atual["nome_usuario"] == usuario["nome_usuario"]:
+            indice_remetente = indice
+            break
+    
     destinatario = None
     for usuario_destinatario in dados["usuarios"]:
         if usuario_destinatario.get("chave_pix") == buscar_usuario:
@@ -222,6 +228,16 @@ def fazer_pix(usuario):
 
     if not destinatario:
         print("Usuário não encontrado ou não possui chave pix registrada.")
+        return
+
+    confirmacao_pagamento = input(f"Você tem certeza que deseja enviar um pix para {destinatario['nome_usuario']}? (s/n): ").strip().lower()
+    if confirmacao_pagamento != 's':
+        print("Pix cancelado.")
+        return
+    
+    confirmacao_senha = input("Digite sua senha para confirmar o pix: ").strip()
+    if confirmacao_senha != usuario["senha"]:
+        print("Senha incorreta. Pix não realizado.")
         return
 
     valor = float(input("Digite o valor do pix: "))
@@ -233,8 +249,15 @@ def fazer_pix(usuario):
         print("Saldo insuficiente.")
         return
 
+    # Atualizar saldo do remetente
     usuario["saldo da conta"] -= valor
-    destinatario["saldo da conta"] += valor
+    dados["usuarios"][indice_remetente]["saldo da conta"] -= valor
+    
+    # Atualizar saldo do destinatário
+    indice_destinatario = dados["usuarios"].index(destinatario)
+    dados["usuarios"][indice_destinatario]["saldo da conta"] += valor
+    
+    salvar_usuarios(dados)
     print(f"Pix de R${valor} enviado para {destinatario['nome_usuario']} com sucesso!")
 
 def registrar_chave(usuario):

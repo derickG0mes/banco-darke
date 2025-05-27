@@ -12,7 +12,7 @@
             "telefone": "12345678910",
             "gmail": "123@gmail.com",
             "senha": "123456",
-            "saldo da conta": 100,
+            "saldo da conta": 100.0,
             "empréstimo": 0,
             "chave_pix": "12345678910"
         },
@@ -28,7 +28,7 @@
             "telefone": "12345678911",
             "gmail": "1234@gmail.com",
             "senha": "1234567",
-            "saldo da conta": 0,
+            "saldo da conta": 0.0,
             "empréstimo": 0,
             "chave_pix": "12345678911"
         }
