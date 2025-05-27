@@ -178,11 +178,11 @@ def usuario_logado(usuario):
         if opcao == "1":
             saldo_disponivel(usuario)
         elif opcao == "2":
-            area_pix()
+            area_pix(usuario)
         elif opcao == "3":
-            historico_transferencia()
+            historico_transferencia(usuario)
         elif opcao == "4":
-            emprestimo()
+            emprestimo(usuario)
         elif opcao == "5":
             print("\nSaindo da conta...")
             menu()
@@ -194,31 +194,48 @@ def saldo_disponivel(usuario):
     print(f"\nSaldo disponível: {usuario['saldo da conta']}")
     input("\nPressione 'Enter' tecla para continuar...")
 
-def area_pix():
-    print("--ÁREA PIX--")
-    print("1. Fazer pix")
-    print("2. Registrar chave pix")
-    print("3. Voltar")
+def area_pix(usuario):
+    while True:
+        print("--ÁREA PIX--")
+        print("1. Fazer pix")
+        print("2. Registrar chave pix")
+        print("3. Voltar")
+    
+        opcao = input("\nDigite o número da operação: ")
+        if opcao == "1":
+            fazer_pix(usuario)
+        elif opcao == "2":
+            registrar_chave(usuario)
+        elif opcao == "3":
+            break
 
-def fazer_pix():
-    print("--FAZER PIX--")
+def fazer_pix(usuario):
+    print("\n--FAZER PIX--")
     buscar_usuario = input("Digite a chave pix do destinatário: ").strip()
     dados = carregar_usuarios()
     
-    for usuario in dados["usuarios"]:
-        if usuario["chave_pix"] == buscar_usuario:
-            if "chave_pix" in usuario and usuario["chave_pix"]:
-                valor = float(input("Digite o valor do pix: "))
-                if valor <= 0:
-                    print("Valor inválido. Deve ser maior que zero.")
-                    return
-                print(f"Pix de R${valor} enviado para {usuario['nome_usuario']} com sucesso!")
-                return
-            else:
-                print("Usuário não possui chave pix registrada.")
-                return
-            
-    
+    destinatario = None
+    for usuario_destinatario in dados["usuarios"]:
+        if usuario_destinatario.get("chave_pix") == buscar_usuario:
+            destinatario = usuario_destinatario
+            break
+
+    if not destinatario:
+        print("Usuário não encontrado ou não possui chave pix registrada.")
+        return
+
+    valor = float(input("Digite o valor do pix: "))
+    if valor <= 0:
+        print("Valor inválido. Deve ser maior que zero.")
+        return
+
+    if valor > usuario["saldo da conta"]:
+        print("Saldo insuficiente.")
+        return
+
+    usuario["saldo da conta"] -= valor
+    destinatario["saldo da conta"] += valor
+    print(f"Pix de R${valor} enviado para {destinatario['nome_usuario']} com sucesso!")
 
 def registrar_chave(usuario):
     print("\n--REGISTRAR CHAVE PIX--")
