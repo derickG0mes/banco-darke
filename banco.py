@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 
 ARQUIVO_USUARIO = "usuario.json"
 
@@ -137,7 +138,8 @@ def cadastro():
         "gmail": (gmail),
         "senha": (senha),
         "saldo da conta": 0,
-        "empréstimo": 0
+        "empréstimo": 0,
+        "historico_transferencias": []
     }
 
     dados["usuarios"].append(usuario)
@@ -256,6 +258,15 @@ def fazer_pix(usuario):
     # Atualizar saldo do destinatário
     indice_destinatario = dados["usuarios"].index(destinatario)
     dados["usuarios"][indice_destinatario]["saldo da conta"] += valor
+
+    # Registrar transferência no histórico
+    transferencia = {
+        "destinatario": destinatario['nome_usuario'],
+        "valor": valor,
+        "data": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    }
+    
+    dados["usuarios"][indice_remetente]["historico_transferencias"].append(transferencia)
     
     salvar_usuarios(dados)
     print(f"Pix de R${valor} enviado para {destinatario['nome_usuario']} com sucesso!")
@@ -296,11 +307,21 @@ def registrar_chave(usuario):
                     return True
     return False
 
-def historico_transferencia():
-    print("Histórico de transferÊncia")
+def historico_transferencia(usuario):
+    print("Extrato de transferências")
+    for transferencia in usuario["historico_transferencias"]:
+        print(f"Para: {transferencia['destinatario']}, Valor: R${transferencia['valor']}, Data: {transferencia['data']}")
+    input("\nPressione 'Enter' tecla para continuar...")
 
-def emprestimo():
+def emprestimo(usuario):
     print("Empréstimo")
+    valor = float(input("Digite o valor do empréstimo: "))
+    if valor <= 0:
+        print("Valor inválido. Deve ser maior que zero.")
+        return
+
+    usuario["saldo da conta"] += valor
+    print(f"Empréstimo de R${valor} concedido com sucesso!")
 
 if __name__ == '__main__':
     inicializar_arquivo()
