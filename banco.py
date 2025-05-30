@@ -266,12 +266,14 @@ def fazer_pix(usuario):
         "data": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     }
     
+    if "historico_transferencias" not in dados["usuarios"][indice_remetente]:
+        dados["usuarios"][indice_remetente]["historico_transferencias"] = []
     dados["usuarios"][indice_remetente]["historico_transferencias"].append(transferencia)
     
     salvar_usuarios(dados)
     print(f"Pix de R${valor} enviado para {destinatario['nome_usuario']} com sucesso!")
 
-def registrar_chave(usuario):
+def registrar_chave(usuario_atual):
     print("\n--REGISTRAR CHAVE PIX--")
     print("1. Gmail")
     print("2. Telefone")
@@ -281,7 +283,7 @@ def registrar_chave(usuario):
 
     dados = carregar_usuarios()
     for usuario in dados["usuarios"]:
-        if usuario["nome_usuario"] == usuario["nome_usuario"]:
+        if usuario["nome_usuario"] == usuario_atual["nome_usuario"]:
             if opcao == "1":
                 chave_pix = input("Digite seu gmail: ")
                 if chave_pix == usuario["gmail"]:
@@ -308,20 +310,40 @@ def registrar_chave(usuario):
     return False
 
 def historico_transferencia(usuario):
-    print("Extrato de transferências")
-    for transferencia in usuario["historico_transferencias"]:
-        print(f"Para: {transferencia['destinatario']}, Valor: R${transferencia['valor']}, Data: {transferencia['data']}")
+    print("\n--Extrato de transferências")
+    if "historico_transferencias" not in usuario or not usuario["historico_transferencias"]:
+        print("Nenhuma transferência encontrada.")
+    else:
+        for transferencia in usuario["historico_transferencias"]:
+            print(f"Para: {transferencia['destinatario']}, \nValor: R${transferencia['valor']}, \nData: {transferencia['data']}")
     input("\nPressione 'Enter' tecla para continuar...")
 
 def emprestimo(usuario):
-    print("Empréstimo")
+    print("\n--ÁREA DE EMPRÉSTIMO--")
+    if usuario["empréstimo"] > 0:
+        print("Você já possui um empréstimo ativo.")
+        return
+
     valor = float(input("Digite o valor do empréstimo: "))
     if valor <= 0:
         print("Valor inválido. Deve ser maior que zero.")
         return
 
-    usuario["saldo da conta"] += valor
-    print(f"Empréstimo de R${valor} concedido com sucesso!")
+    confirmacao = input(f"Você tem certeza que deseja solicitar um empréstimo de R${valor}? (s/n): ").strip().lower()
+    if confirmacao != 's':
+        print("Empréstimo cancelado.")
+        return
+
+    usuario["empréstimo"] = valor
+    dados = carregar_usuarios()
+    
+    for i, user in enumerate(dados["usuarios"]):
+        if user["nome_usuario"] == usuario["nome_usuario"]:
+            dados["usuarios"][i] = usuario
+            break
+    
+    salvar_usuarios(dados)
+    print(f"Empréstimo de R${valor} solicitado com sucesso!")
 
 if __name__ == '__main__':
     inicializar_arquivo()

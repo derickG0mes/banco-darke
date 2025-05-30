@@ -1,34 +1,41 @@
 {
     "usuarios": [
         {
-            "nome_usuario": "derick.gomes",
-            "nome": "Derick Enzo",
-            "sobrenome": "Gomes de Brito Costa",
+            "nome_usuario": "abc.123",
+            "nome": "Abc",
+            "sobrenome": "123",
             "idade": 18,
-            "data de nascimento": "28/01/2007",
+            "data de nascimento": "10/06/2000",
             "cpf": "12345678910",
             "rg": "12345678910",
-            "endereço": "Artur Alvim",
+            "endereço": "Canadá",
             "telefone": "12345678910",
             "gmail": "123@gmail.com",
             "senha": "123456",
-            "saldo da conta": 100.0,
-            "empréstimo": 0,
-            "chave_pix": "12345678910"
+            "saldo da conta": 90.0,
+            "empréstimo": 10.0,
+            "chave_pix": "12345678910",
+            "historico_transferencias": [
+                {
+                    "destinatario": "def.456",
+                    "valor": 10.0,
+                    "data": "30/05/2025 16:52:50"
+                }
+            ]
         },
         {
-            "nome_usuario": "derick.enzo",
-            "nome": "Derick",
-            "sobrenome": "Enzo",
+            "nome_usuario": "def.456",
+            "nome": "Def",
+            "sobrenome": "456",
             "idade": 18,
-            "data de nascimento": "28/12/2007",
+            "data de nascimento": "10/12/1997",
             "cpf": "12345678911",
             "rg": "12345678911",
-            "endereço": "Itaquera",
+            "endereço": "Estados Unidos",
             "telefone": "12345678911",
-            "gmail": "1234@gmail.com",
+            "gmail": "456@gmail.com",
             "senha": "1234567",
-            "saldo da conta": 0.0,
+            "saldo da conta": 10.0,
             "empréstimo": 0,
             "chave_pix": "12345678911"
         }
