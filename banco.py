@@ -19,7 +19,7 @@ def carregar_usuarios():
         return dados
     except (json.JSONDecodeError, FileExistsError):
         return {"usuarios": []}
-    
+
 def salvar_usuarios(dados):
     with open(ARQUIVO_USUARIO, "w", encoding='utf-8') as file:
         json.dump(dados, file, ensure_ascii=False, indent=4)
@@ -53,15 +53,20 @@ def menu():
         opcao = input("\nDigite o número da operação: ")
 
         if opcao == "1":
+            limpa_tela()
             cadastro()
         elif opcao == "2":
+            limpa_tela()
             login()
         elif opcao == "3":
-            print("Saindo do banco...")
+            limpa_tela()
+            print("Obrigado por usar o Banco Darke!")
             print("Volte sempre.")
             break
         else:
             print("\nEscolha uma operação de 1 a 3")
+            input("Pressione Enter para continuar...")
+            limpa_tela()
 
 def cadastro():
     print("\n--ÁREA DE CADASTRO--")
@@ -81,7 +86,17 @@ def cadastro():
         print("Você ainda é menor de idade para criar uma conta neste banco")
         idade = int(input("\nDigite a sua idade: "))
 
-    data_nascimento = input("\nDigite a sua data de nascimento: ").strip()
+    data_nascimento = input("\nDigite o seu ano de nascimento: ").strip()
+    while not data_nascimento.isdigit() or len(data_nascimento) != 4:
+        print("Ano inválido. Digite um ano com 4 dígitos.")
+        data_nascimento = input("\nDigite o seu ano de nascimento: ").strip()
+
+    ano_atual = datetime.now().year
+    idade_calculada = ano_atual - int(data_nascimento)
+    
+    if idade_calculada != idade:
+        print(f"A idade informada ({idade}) não corresponde ao ano de nascimento ({data_nascimento})")
+        idade = idade_calculada
 
     cpf = input("\nDigite o CPF: ").strip()
     while len(cpf) != 11 or not cpf.isdigit() or verificar_usuario_existente("cpf", cpf):
@@ -186,8 +201,10 @@ def usuario_logado(usuario):
         elif opcao == "4":
             emprestimo(usuario)
         elif opcao == "5":
+            limpa_tela()
             print("\nSaindo da conta...")
             menu()
+            break
         else:
             print("\nEscolha uma operação de 1 a 5")
 
@@ -195,6 +212,7 @@ def saldo_disponivel(usuario):
     print("\n--SALDO DA CONTA--")
     print(f"\nSaldo disponível: {usuario['saldo da conta']}")
     input("\nPressione 'Enter' tecla para continuar...")
+    limpa_tela()
 
 def area_pix(usuario):
     while True:
@@ -271,6 +289,7 @@ def fazer_pix(usuario):
     dados["usuarios"][indice_remetente]["historico_transferencias"].append(transferencia)
     
     salvar_usuarios(dados)
+    limpa_tela()
     print(f"Pix de R${valor} enviado para {destinatario['nome_usuario']} com sucesso!")
 
 def registrar_chave(usuario_atual):
@@ -317,6 +336,7 @@ def historico_transferencia(usuario):
         for transferencia in usuario["historico_transferencias"]:
             print(f"Para: {transferencia['destinatario']}, \nValor: R${transferencia['valor']}, \nData: {transferencia['data']}")
     input("\nPressione 'Enter' tecla para continuar...")
+    limpa_tela()
 
 def emprestimo(usuario):
     print("\n--ÁREA DE EMPRÉSTIMO--")
@@ -343,6 +363,7 @@ def emprestimo(usuario):
             break
     
     salvar_usuarios(dados)
+    limpa_tela()
     print(f"Empréstimo de R${valor} solicitado com sucesso!")
 
 if __name__ == '__main__':
